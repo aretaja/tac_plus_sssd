@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  app:
+    image: tac_plus_sssd:latest
+    container_name: tac_plus
+    restart: unless-stopped
+    expose:
+      - "49/tcp"
+    ports:
+      - "49:49/tcp"
+    logging:
+      driver: syslog
+      options:
+        tag: "{{.DaemonName}}.{{.Name}}"
+    environment:
+        CONFIG_PATH: /etc/tacacs+
+        DEBUGLVL: 16
+        FILTERREGEX: "Reading config| F4.0.4.27a |socket FD 4 AF 2|uid=0 euid=0 gid=0 egid=0|connect from|Read -1 bytes from|root    non-tty|fd . eof"
+    volumes:
+      - type: bind
+        source: /var/log/my_containers/tac_plus
+        target: /var/log
+      - type: bind
+        source: /etc/tacacs+
+        target: /etc/tacacs+
+        read_only: true
+      - type: bind
+        source: /var/lib/sss/pipes/
+        target: /var/lib/sss/pipes/
